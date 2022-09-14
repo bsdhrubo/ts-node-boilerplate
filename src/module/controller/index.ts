@@ -23,9 +23,9 @@ router.post('/insert-one',  async (req: Request, res: Response)=>{
     const {success, errors} = await validateRequest(req.body)
     if(success){
         const response = await insertOne(req.body)
-        res.json(response)
+        res.send(response)
     }else{
-        res.json(errors)
+        res.send(errors)
     }
 })
 router.delete('/delete/:id', async (req, res)=>{
