@@ -12,6 +12,7 @@ const port = 3000
 app.use(router)
  
 const start = async () => {
+  console.log('starting....')
     try {
       await connectToDatabase()
       app.listen(port, () => console.log(`http://localhost:${port}`));

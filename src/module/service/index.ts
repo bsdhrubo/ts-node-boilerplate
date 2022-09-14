@@ -18,20 +18,9 @@ export const getAll = async(skip=0)=>{
     return res
 }
 
-export const insertOne = async(data: any): Promise<any>=>{ 
-    try {
-        const res = await TodoModel.create(data)
-        res.title = 'sdfjsjdbfg sdfgbjsd sdfgnjdsf' 
-        const {success, errors} = await validateResponse(res)
-        if(success){
-            return res
-        }else{
-            return errors
-        }
-    } catch (error) {
-        return error
-    }
-    
+export const insertOne = async(data: any)=>{ 
+    const res = await TodoModel.create(data)
+    return res
 } 
 
 export const deleteById = async(id: any)=>{ 

@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
+import { config } from "./config";
 
 export const connectToDatabase = async ()=>{
-    try {
-        const mongoURI = "mongodb://127.0.0.1/boilerplate";
-        await mongoose.connect(mongoURI); 
+    try { 
+        await mongoose.connect(config.mongoURI); 
 
         const db = mongoose.connection;
-        db.on("connected", ()=> console.log("MongoDB connected"))
+        
         db.on("error", console.error.bind(console, "MongoDB connection error:"));
     } catch (error) {
         console.log(error)
