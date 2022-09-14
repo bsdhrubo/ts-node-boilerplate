@@ -1,20 +1,21 @@
-import fetch from 'node-fetch'
-import { validateResponse } from '../controller/dto/validator.dto'
+import fetch from 'node-fetch' 
+import { config } from '../../config'
 import TodoModel from '../model'
-import { ITodo } from '../model/model.interface'
 
-export const insertMany = async()=>{
-    const apiURL = 'https://jsonplaceholder.typicode.com/todos'
-    const data = await (await fetch(apiURL)).json()
-    
-    await TodoModel.collection.drop()
-    await TodoModel.insertMany(data)
-
-    return "ok"
+export const insertMany = async()=>{ 
+    try {
+        const data = await (await fetch(config.externalApiUrl)).json()
+        await TodoModel.collection.drop()
+        await TodoModel.insertMany(data)
+        return await getAll()
+    } catch (error) {
+        console.log(error);
+        return false 
+    }
 } 
 
-export const getAll = async(skip=0)=>{
-    const res = await TodoModel.find().skip(skip).limit(20)
+export const getAll = async(page=1)=>{
+    const res = await TodoModel.find().skip((page-1)*20).limit(20)
     return res
 }
 

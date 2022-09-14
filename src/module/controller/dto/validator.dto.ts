@@ -1,54 +1,83 @@
-import { plainToClass } from "class-transformer";
-import { IsBoolean, IsNumber, IsString, MaxLength, MinLength, validate } from "class-validator";
-
-export class RequestDto{
-    @IsNumber()
-    userId: number
-
-    @IsNumber()
-    id: number
-
-    @IsString()
-    @MaxLength(10)
-    @MinLength(3)
-    title: string
-
-    @IsBoolean()
-    completed: boolean
+interface IPropertySchema {
+    type: string
+    required: boolean
+    maxLength?: number
+    minLength?: number
+    min?:number
+    max?:number
 }
 
-export const validateRequest = async (data: any)=>{
+interface IResult{
+    success: boolean
+    errors: [{
+        key: string
+        message: string
+    }]
+}
 
-    console.log('validating....')
-    const newData = plainToClass(RequestDto, data);
-    const errors = await validate(newData)
-    const mapped = errors.map(e =>{
-        delete e.target;
-        delete e.children;
-        return e
-    })
-    if (mapped.length > 0) {
-        console.log('Request validation failed. errors: ',);
-        return {success: false, errors: mapped}
-    } else {
-        return {success: true}
+type IValidationSchema = {
+    [key: string]: IPropertySchema;
+  };
+
+
+const validationSchema: IValidationSchema = {
+    userId: {
+        type: 'number',
+        required: true
+    }, 
+    id:{
+        type: 'number',
+        required: true
+    }, 
+    title:{
+        type: 'string',
+        required: true,
+        maxLength: 10,
+        minLength: 3
+    },
+    completed:{
+        type: 'boolean',
+        required: true
     }
 }
 
-export const validateResponse = async (data: any)=>{
-    console.log({data})
-    console.log('validating....')
-    const newData = plainToClass(RequestDto, data);
-    const errors = await validate(newData)
-    const mapped = errors.map(e =>{
-        delete e.target;
-        delete e.children;
-        return e
-    })
-    if (mapped.length > 0) {
-        console.log('Response validation failed. errors: ');
-        return {success: false, errors: mapped}
-    } else {
-        return {success: true}
+export const validateRequest=(data: any)=>{ 
+    const dataKeys = Object.keys(data) 
+    let result: IResult = {
+        success: true,
+        errors: [{key:'', message:''}]
     }
+    result.errors.pop()
+    for(let [key, value] of Object.entries(validationSchema)){
+        const isExist = dataKeys.includes(key) 
+        console.log({value})
+        if(isExist){
+            if(value.type !== typeof data[key]){
+                result = makeError(key, `Should be ${value.type} type`, result)
+            }else{
+                if(value.type === 'string'){ 
+                    if(value?.maxLength && (data[key]?.length > value?.maxLength)){
+                        result = makeError(key, `Length should be maximum ${value?.maxLength}`, result)
+                    }
+                    if(value?.minLength && (data[key]?.length < value?.minLength)){
+                        result = makeError(key, `Length should be minimun ${value?.minLength}`, result)
+                    }
+                }
+            }
+        }else{
+            if(value.required){
+                result = makeError(key, `Key not found`, result)
+            } 
+        } 
+    } 
+    return {...result}
+}
+
+const makeError=(key: string, message: string ,result: IResult)=>{
+    result.success = false
+    result.errors.push({
+        key,
+        message
+    })
+    return result
 }
