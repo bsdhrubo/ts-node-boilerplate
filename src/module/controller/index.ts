@@ -1,6 +1,7 @@
 import {Request, Response, Router} from 'express'
-import { deleteById, getAll, insertMany, insertOne } from '../service'
-import {validateRequest } from './dto/validator.dto'
+import { validateRequest } from '../../utils'
+import { deleteById, getAll, insertMany, insertOne } from '../service' 
+import { createTodoSchema } from './dto/validator.dto'
 
 const router = Router()
 
@@ -21,7 +22,7 @@ router.get('/insert-many', async (req: Request, res: Response)=>{
 router.post('/insert-one',  async (req: Request, res: Response)=>{
     //validate req
     console.log(req.body)
-    const {success, errors} = await validateRequest(req.body)
+    const {success, errors} = await validateRequest(createTodoSchema, req.body)
     console.log(success)
     if(success){
         const response = await insertOne(req.body)
