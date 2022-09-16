@@ -19,20 +19,11 @@ router.get('/insert-many', async (req: Request, res: Response)=>{
     const response = await insertMany() 
     res.send(response)
 })
-router.post('/insert-one',  async (req: Request, res: Response)=>{
-    //validate req
-    console.log(req.body)
-    const {success, errors} = await validateRequest(createTodoSchema, req.body)
-    console.log(success)
-    if(success){
-        const response = await insertOne(req.body)
-        res.send(response)
-    }else{
-        res.send(errors)
-    }
+router.post('/insert-one', validateRequest(createTodoSchema), async (req: Request, res: Response)=>{
+    const response = await insertOne(req.body)
+    res.send(response)
 })
 router.delete('/delete/:id', async (req: Request, res: Response)=>{
-    console.log(req.params.id)
     const response = await deleteById(req.params.id)
     res.send(response)
 })

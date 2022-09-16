@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const port = 3000
 
 app.use(router)
- 
+
 const start = async () => {
   console.log('starting....')
     try {

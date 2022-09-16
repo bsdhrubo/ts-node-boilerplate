@@ -1,3 +1,5 @@
+import {Request, Response, NextFunction } from "express"
+
 interface IPropertySchema {
     type: string
     required: boolean
@@ -21,7 +23,7 @@ export type IValidationSchema = {
 
 
 
-export const validateRequest=(dto:IValidationSchema, data: any)=>{ 
+const validationChecker = (dto:IValidationSchema, data: any)=>{ 
     const dataKeys = Object.keys(data) 
     let result: IResult = {
         success: true,
@@ -59,4 +61,13 @@ const makeError=(key: string, message: string ,result: IResult)=>{
         message
     })
     return result
+}
+
+export const validateRequest =  (schema: IValidationSchema) => (req: Request, res: Response, next: NextFunction)=>{
+    const {success, errors} = validationChecker(schema, req.body)
+    if(success){
+        next()
+    }else{
+        res.send(errors)
+    }
 }
